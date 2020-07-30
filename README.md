@@ -1,5 +1,9 @@
-#添加依赖
-请将如下 jar 包放入 libs 文件夹中
+Jeejio JM
+# 概述
+Jeejio JM SDK 致力于让第三方开发者开发基于 Jeejio 智能设备的应用时，快速集成与智能设备及其所属用户通信的能力。除了接收用户发送的文字、语音外，还可以处理规定格式的命令。
+# 集成指南 
+## 添加依赖
+前往 [Github](https://github.com/jeejio/JeejioMessageSDK/releases/tag/1.0.0) 下载，将如下 jar 包放入 libs 文件夹中
 - j-message.jar
 - smack-core.jar
 - smack-extensions.jar
@@ -20,8 +24,8 @@ implementation('com.aliyun.dpa:oss-android-sdk:2.9.2', {
 })
 ```
 
-#登录注册
-##初始化SDK
+## 登录注册
+### 初始化SDK
 登录前需做 SDK 的初始化。
 ```java
 // 初始化 Oss
@@ -34,10 +38,10 @@ try {
 } catch (IllegalAccessException e) {
 }
 ```
-##注册
+### 注册
 接入 SDK 的应用是提供给物栖智能设备的应用，无需注册，当该应用下载到物栖智能设备上会自动完成注册操作。
 
-##登录
+### 登录
 SDK 中所有操作均需在登录之后进行。
 ```java
 // 第三方应用用户登录
@@ -53,28 +57,13 @@ JMClient.SINGLETON.applicationLogin(machineCodeAndPackageName, new ILoginListene
 		// 登录失败
 	}
 });
-
-// 用户名+密码登录模式
-// username:用户名
-// password:密码
-JMClient.SINGLETON.login(username, password, new ILoginListener() {
-	@Override
-	public void onSuccess() {
-		// 登录成功
-	}
-
-	@Override
-	public void onFailure(Exception e) {
-		// 登录失败
-	}
-});
 ```
-##登出
+### 登出
 虽然即使不调用登出方法，服务器也会在 300s 后断开闲置客户端，但为了避免丢失离线消息，需在应用退出时需调用登出方法。
 ```java
 JMClient.SINGLETON.logout();
 ```
-##添加连接状态监听
+### 添加连接状态监听
 当监听器的 connectionClosedOnError() 方法被回调时，如果错误信息中包含 conflict 关键字，则表示是同一个账号在另一个客户端上登录，当前客户端会被踢下线。
 ```java
 JMClient.SINGLETON.addConnectionListener(new ConnectionListener() {
@@ -101,7 +90,7 @@ JMClient.SINGLETON.addConnectionListener(new ConnectionListener() {
 	}
 });
 ```
-##手动重连
+### 手动重连
 服务端为了节省资源，通常会关闭闲置客户端，虽然客户端与服务端有心跳机制进行保活，但仍然存在会话失效的情况，这时候客户端在 ping 服务器发现没有响应（3 次）的时候，会关闭连接。
 客户端可以监听到连接关闭，这时候可以选择调用 JMClient.SINGLETON.reconnect() 方法进行手动重连。
 eg：
@@ -141,7 +130,7 @@ JMClient.SINGLETON.applicationLogin(new ILoginListener() {
     }
 });
 ```
-#消息
+## 消息
 发送文本、语音、命令等消息（单聊、群聊通用）
 ##获取消息管理者
 ```java
@@ -159,8 +148,8 @@ JMClient.SINGLETON.getMessageManager().addChatListener(new IChatListener() {
 });
 ```
 
-##发送消息
-###发送文本消息
+### 发送消息
+#### 发送文本消息
 ```java
 // toUsername:单聊为对方 id，群聊为群 id
 MessageBean message = MessageBean.createTextMessage(toUsername,content);
@@ -186,7 +175,7 @@ JMClient.SINGLETON.getMessageManager().sendMessage(message, new JMCallback<Messa
 });
 ```
 
-###发送语音消息
+#### 发送语音消息
 ```java
 // toUsername:单聊为对方 id，群聊为群 id
 // filePath:语音文件路径
@@ -208,7 +197,7 @@ JMClient.SINGLETON.getMessageManager().sendMessage(message);
 ```
 如果需要监听发送结果，请参考文本消息
 
-###发送扩展消息
+#### 发送扩展消息
 如果以上方法仍满足不了需求，可以设置 Message 的 extend 属性，作为扩展字段，自己定义解析规则，推荐 json 格式的字符串。
 ```java
 MessageBean message = new MessageBean(content, toUsername);
@@ -222,7 +211,7 @@ message.setExtend("{"key":"value"}");
 JMClient.SINGLETON.getFriendManager();
 ```
 
-##监听好友状态
+### 监听好友状态
 ```java
 JMClient.SINGLETON.getFriendManager().addFriendListener(new IFriendListener() {
 	@Override
@@ -262,7 +251,7 @@ JMClient.SINGLETON.getFriendManager().addFriendListener(new IFriendListener() {
 });
 ```
 
-##获取好友列表
+### 获取好友列表
 由于 JM 的用户系统是区分类型的，分为普通用户类型（userType 为 1）、设备用户类型（userType 为 2）、应用用户类型（userType 为 3），所以在查询好友列表时需分别查询。
 ```java
 // 默认从缓存中获取
@@ -292,7 +281,7 @@ JMClient.SINGLETON.getFriendManager().getListFromServer(userType, new JMCallback
 });
 ```
 
-##获取单个好友
+### 获取单个好友
 ```java
 JMClient.SINGLETON.getFriendManager().getContactInfo(userType, username, new JMCallback<UserBean>() {
 	@Override
@@ -307,7 +296,7 @@ JMClient.SINGLETON.getFriendManager().getContactInfo(userType, username, new JMC
 });
 ```
 
-##添加好友
+### 添加好友
 ```java
 // loginName 为待添加好友的用户名
 // remark 为备注,可以为空
@@ -327,13 +316,13 @@ JMClient.SINGLETON.getFriendManager().add(loginName, remark, source, invitationM
 });
 ```
 
-##同意添加好友
+### 同意添加好友
 ```java
 // loginName 为待添加好友的用户名
 JMClient.SINGLETON.getFriendManager().agreeAdd(loginName);
 ```
 
-##删除好友
+### 删除好友
 ```java
 // loginName 为待删除好友的用户名
 JMClient.SINGLETON.getFriendManager().delete(loginName, new JMCallback<Object>() {
@@ -350,20 +339,20 @@ JMClient.SINGLETON.getFriendManager().delete(loginName, new JMCallback<Object>()
 });
 ```
 
-##判断与对方是否互为好友
+### 判断与对方是否互为好友
 ```java
 // 如果是好友,返回对应好友信息,否则返回 null
 FriendBean friend = JMClient.SINGLETON.getFriendManager().isFriend(loginName);
 ```
 
-##修改备注
+### 修改备注
 ```java
 // loginName 为对方的用户名
 // remarkName 为新备注
 JMClient.SINGLETON.getFriendManager().updateRemarkName(loginName, remarkName);
 ```
 
-##获取好友消息置顶状态
+### 获取好友消息置顶状态
 ```java
 // loginName 为对方的用户名
 JMClient.SINGLETON.getFriendManager().getTop(loginName, new JMCallback<Boolean>() {
@@ -379,7 +368,7 @@ JMClient.SINGLETON.getFriendManager().getTop(loginName, new JMCallback<Boolean>(
 });
 ```
 
-## 设置好友消息置顶
+### 设置好友消息置顶
 ```java
 // loginName 为对方的用户名
 // top 表示置顶状态,0 表示非置顶,1 表示置顶
@@ -396,7 +385,7 @@ JMClient.SINGLETON.getFriendManager().setTop(loginName,top, new JMCallback<Integ
 });
 ```
 
-##获取好友消息免打扰状态
+### 获取好友消息免打扰状态
 ```java
 // loginName 为对方的用户名
 JMClient.SINGLETON.getFriendManager().getDoNotDisturb(loginName, new JMCallback<Boolean>() {
@@ -412,7 +401,7 @@ JMClient.SINGLETON.getFriendManager().getDoNotDisturb(loginName, new JMCallback<
 });
 ```
 
-## 设置好友消息免打扰
+### 设置好友消息免打扰
 ```java
 // loginName 为对方的用户名
 // doNotDisturb 表示置顶状态,0 表示非免打扰,1 表示免打扰
@@ -429,7 +418,7 @@ JMClient.SINGLETON.getFriendManager().setDoNotDisturb(loginName,doNotDisturb, ne
 });
 ```
 
-##获取好友申请历史
+### 获取好友申请历史
 ```java
 JMClient.SINGLETON.getFriendManager().getHistoryOfFriendRequest(new JMCallback<List<RequestHistoryBean>>() {
 	@Override
@@ -444,13 +433,13 @@ JMClient.SINGLETON.getFriendManager().getHistoryOfFriendRequest(new JMCallback<L
 });
 ```
 
-#群组管理
-##获取群组管理者
+## 群组管理
+### 获取群组管理者
 ```java
 JMClient.SINGLETON.getGroupChatManager();
 ```
 
-##添加群聊监听
+### 添加群聊监听
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().addGroupChatListener(mGroupChatLocalpart, new GroupChatManager.GroupChatListeners(new ParticipantStatusListener() {
@@ -611,13 +600,13 @@ JMClient.SINGLETON.getGroupChatManager().addGroupChatListener(mGroupChatLocalpar
 }));
 ```
 
-##移除群聊监听
+### 移除群聊监听
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().removeGroupChatListener(localpart,groupChatListeners);
 ```
 
-##加入群聊
+### 加入群聊
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().joinGroupChat(localpart, new JMCallback<Object>() {
@@ -633,7 +622,7 @@ JMClient.SINGLETON.getGroupChatManager().joinGroupChat(localpart, new JMCallback
 });
 ```
 
-##退出群聊
+### 退出群聊
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().leaveGroupChat(localpart, , new JMCallback<Object>() {
@@ -649,7 +638,7 @@ JMClient.SINGLETON.getGroupChatManager().leaveGroupChat(localpart, , new JMCallb
 });
 ```
 
-##获取群成员列表
+### 获取群成员列表
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().getGroupChatOccupants(localpart, new JMCallback<List<GroupChatOccupantBean>>() {
@@ -665,7 +654,7 @@ JMClient.SINGLETON.getGroupChatManager().getGroupChatOccupants(localpart, new JM
 });
 ```
 
-##获取群成员数量
+### 获取群成员数量
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().getGroupChatOccupantsCount(localpart, new JMCallback<Integer>() {
@@ -681,7 +670,7 @@ JMClient.SINGLETON.getGroupChatManager().getGroupChatOccupantsCount(localpart, n
 });
 ```
 
-##获取群聊默认名称
+### 获取群聊默认名称
 群聊名称允许为空，当名称为空时，可以通过该方法获取一个默认名称用于展示，默认名称类似微信，使用前几个群成员的昵称拼接。
 ```java
 // localpart: 群聊唯一标识
@@ -701,7 +690,7 @@ JMClient.SINGLETON.getGroupChatManager().getGroupChatNameDefault(localpart, new 
                     });
 ```
 
-##获取群主的 username
+### 获取群主的 username
 ```java
 // localpart: 群聊唯一标识
 JMClient.SINGLETON.getGroupChatManager().getOwner(localpart, new JMCallback<String>() {
@@ -717,7 +706,7 @@ JMClient.SINGLETON.getGroupChatManager().getOwner(localpart, new JMCallback<Stri
 });
 ```
 
-##设置群名称
+### 设置群名称
 只有群主可以设置群名称
 ```java
 // localpart: 群聊唯一标识
@@ -725,7 +714,7 @@ JMClient.SINGLETON.getGroupChatManager().getOwner(localpart, new JMCallback<Stri
 JMClient.SINGLETON.getGroupChatManager().setGroupChatName(localpart, groupChatName);
 ```
 
-##设置是否展示群昵称
+### 设置是否展示群昵称
 ```java
 // localpart: 群聊唯一标识
 // display: 0 为不展示群成员昵称，1 为展示
@@ -742,7 +731,7 @@ JMClient.SINGLETON.getGroupChatManager().setDisplayOccupantName(localpart, displ
 });
 ```
 
-##设置群头像
+### 设置群头像
 只有群主可以设置群头像
 ```java
 // localpart: 群聊唯一标识
@@ -760,7 +749,7 @@ JMClient.SINGLETON.getGroupChatManager().setGroupChatImage(localpart, imgUrl, ne
 });
 ```
 
-##获取我的群聊
+### 获取我的群聊
 ```java
 JMClient.SINGLETON.getGroupChatManager().getMyGroupChat(new JMCallback<List<GroupChatBean>>() {
 	@Override
@@ -775,7 +764,7 @@ JMClient.SINGLETON.getGroupChatManager().getMyGroupChat(new JMCallback<List<Grou
 });
 ```
 
-##获取群信息
+### 获取群信息
 群信息在从服务器拉取后会在本地缓存，所以可以选择从本地获取还是从网络获取
 ```java
 // localpart: 群聊唯一标识
@@ -806,7 +795,7 @@ JMClient.SINGLETON.getGroupChatManager().getGroupChatInfo(groupChatLocalPart, ch
 });
 ```
 
-##设置是否免打扰
+### 设置是否免打扰
 ```java
 // localpart: 群聊唯一标识
 // doNotDisturb: 0 为非免打扰，1 为免打扰
@@ -823,7 +812,7 @@ JMClient.SINGLETON.getGroupChatManager().setDoNotDisturb(mGroupChatLocalpart, do
 });
 ```
 
-##设置是否置顶
+### 设置是否置顶
 ```java
 // localpart: 群聊唯一标识
 // top: 0 为不置顶，1 为置顶
@@ -840,21 +829,21 @@ JMClient.SINGLETON.getGroupChatManager().setTop(mGroupChatLocalpart, top, new JM
 });
 ```
 
-##群主转让
+### 群主转让
 ```java
 // localpart: 群聊唯一标识
 // newOwnerUsername：新群主的 username
 JMClient.SINGLETON.getGroupChatManager().transferOwner(localpart, newOwnerUsername);
 ```
 
-##设置我在本群中的昵称
+### 设置我在本群中的昵称
 ```java
 // localpart: 群聊唯一标识
 // occupantName: 我在本群中的昵称
 JMClient.SINGLETON.getGroupChatManager().setOccupantName(mGroupChatLocalpart,content);
 ```
 
-##获取用户在群聊中的昵称
+### 获取用户在群聊中的昵称
 ```java
 // localpart: 群聊唯一标识
 // username: 查询目标用户
@@ -871,7 +860,7 @@ JMClient.SINGLETON.getGroupChatManager().getOccupantName(localpart, username, ne
 });
 ```
 
-##创建群聊
+### 创建群聊
 ```java
 // name: 群名称，可以为空字符串
 // occupants: 群成员 username 的集合
@@ -889,7 +878,7 @@ JMClient.SINGLETON.getGroupChatManager().createGroupChat(name, occupants, imgUrl
 });
 ```
 
-##邀请人进群
+### 邀请人进群
 ```java
 // localpart: 群聊唯一标识
 // invitees: 被邀请人的 username 的集合
@@ -906,7 +895,7 @@ JMClient.SINGLETON.getGroupChatManager().sendGroupChatInvitation(localpart, invi
 });
 ```
 
-##群踢人
+### 群踢人
 只有群主可以进行踢人操作
 ```java
 // localpart: 群聊唯一标识
@@ -925,9 +914,9 @@ JMClient.SINGLETON.getGroupChatManager().kick(localpart, occupants, reason, new 
 });
 ```
 
-#命令
+## 命令
 命令是 JM SDK 的一大特色，使用者输入正确规则的命令内容，如果接收方对该命令有处理的话，会执行相应的操作。
-##命令的输入规则
+### 命令的输入规则
 关键字[ -参数名简称 参数值]...
 或
 关键字[ --参数名全称 参数值]...
@@ -939,7 +928,7 @@ eg：
 - appInstall --name 亲子教育
 - appList -p 1 -pageSize 10
 
-##命令的处理规则
+### 命令的处理规则
 上面是命令的正确输入规则，按照上述规则输入的命令会通过验证，被接收方收到，但在收到时 SDK 中还会验证你是否可以处理该命令，想要处理一个命令，需定义一个命令处理者类，在该类中声明处理命令的方法，并使用 @Command 注解修饰该方法，用 @Param 注解修饰参数，最后在 JMClient.SINGLETON.init(this) 初始化的时候传入该命令处理者。
 @Command 注解用于声明命令对应的处理方法。
 属性：
@@ -962,8 +951,7 @@ eg：
 	
 
 ------------
-
-发你   
+ 
 eg：
 ```java
 public class CommandHandler {
