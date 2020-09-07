@@ -8,7 +8,7 @@ Jeejio JM SDK 致力于让第三方开发者开发基于 Jeejio 智能设备的�
 
 请将如下 aar 包放入 libs 文件夹中
 
--   jmessagemodule-release
+-   jmessagemodule-preview
 -   smack-core-release
 -   smack-extensions-release
 -   smack-im-release
@@ -18,12 +18,12 @@ Jeejio JM SDK 致力于让第三方开发者开发基于 Jeejio 智能设备的�
 eg:
 
 ```xml
-    implementation(name: 'jmessagemodule-release', ext: 'aar')
-    implementation(name: 'smack-core-release', ext: 'aar')
-    implementation(name: 'smack-extensions-release', ext: 'aar')
-    implementation(name: 'smack-im-release', ext: 'aar')
-    implementation(name: 'smack-sasl-provided-release', ext: 'aar')
-    implementation(name: 'smack-tcp-release', ext: 'aar')
+    implementation(name: 'jmessagemodule-preview', ext: 'aar')
+    implementation(name: 'smack-core-preview', ext: 'aar')
+    implementation(name: 'smack-extensions-preview', ext: 'aar')
+    implementation(name: 'smack-im-preview', ext: 'aar')
+    implementation(name: 'smack-sasl-provided-preview', ext: 'aar')
+    implementation(name: 'smack-tcp-preview', ext: 'aar')
 ```
 
 QA 环境
@@ -86,52 +86,6 @@ try {
 
 接入 SDK 的应用是提供给物栖智能设备的应用，无需注册，当该应用下载到物栖智能设备上会自动完成注册操作。
 
-### 登录
-
-SDK 中所有操作均需在登录之后进行。
-
-eg：
-
-```java
-// 第三方应用用户登录
-JMClient.SINGLETON.applicationLogin(new ILoginListener() {
-	@Override
-	public void onSuccess() {
-		// 登录成功
-	}
-
-	@Override
-	public void onFailure(Exception e) {
-		// 登录失败
-	}
-});
-```
-
-<!-- // 用户名+密码登录模式
-// username:用户名
-// password:密码
-JMClient.SINGLETON.login(username, password, new ILoginListener() {
-	@Override
-	public void onSuccess() {
-		// 登录成功
-	}
-
-	@Override
-	public void onFailure(Exception e) {
-		// 登录失败
-	}
-}); -->
-
-### 登出
-
-虽然即使不调用登出方法，服务器也会在一段时间后自动断开闲置客户端，但为了更好的状态同步，需在应用退出时及时调用登出方法。
-
-eg：
-
-```java
-JMClient.SINGLETON.logout();
-```
-
 ### 添加连接状态监听
 
 当监听器的 connectionClosedOnError() 方法被回调时，如果错误信息中包含 conflict 关键字，则表示是同一个账号在另一个客户端上登录，当前客户端会被踢下线。
@@ -163,6 +117,32 @@ JMClient.SINGLETON.addOnConnectListener(new IOnConnectListener() {
 		// 连接断开
     }
 });
+```
+
+### 登录
+
+SDK 中所有操作均需在登录之后进行，在调用登录方法前需要设置连接监听器，登录成功会回调监听器的 onAuthenticated() 方法，登录失败会回调 onConnectFailure() 方法。
+
+eg：
+
+```java
+// 第三方应用用户登录
+JMClient.SINGLETON.applicationLogin();
+```
+
+<!-- // 用户名+密码登录模式
+// username:用户名
+// password:密码
+JMClient.SINGLETON.login(username, password); -->
+
+### 登出
+
+虽然即使不调用登出方法，服务器也会在一段时间后自动断开闲置客户端，但为了更好的状态同步，需在应用退出时及时调用登出方法。
+
+eg：
+
+```java
+JMClient.SINGLETON.logout();
 ```
 
 ### 手动重连
